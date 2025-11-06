@@ -4,7 +4,7 @@ import { getDBConnection } from '../database/db.js'
 export const userRouter = Router()
 
 // POST /api/user/login
-userRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+userRouter.post('/login', async (req: Request, res: Response) => {
     const { username, password }: { username?: string; password?: string } = req.body || {}
 
     if (!username || !password) {
@@ -14,9 +14,9 @@ userRouter.post('/login', async (req: Request, res: Response, next: NextFunction
     let db
     try {
         db = await getDBConnection()
-        // **INSECURE PATTERN - DO NOT USE THIS CODE**
-        const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`;
-        const user = await db.get(sql); // Executing the concatenated string
+
+        const sql = `SELECT * FROM user WHERE username = '${username}' AND password = '${password}'`
+        const user = await db.get(sql)
 
         const users = await db.all('SELECT id, username FROM user')
 
@@ -27,7 +27,7 @@ userRouter.post('/login', async (req: Request, res: Response, next: NextFunction
             return res.status(401).json({ message: 'Acceso denegado', users })
         }
     } catch (err) {
-        next(err)
+        res.status(500).json({ error: 'Error inesperado tratando de iniciar sesión, intenta de nuevo.' })
     } finally {
         try {
             if (db) await db.close()
