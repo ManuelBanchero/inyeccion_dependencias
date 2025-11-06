@@ -1,9 +1,11 @@
-import express from 'express';
+import express from 'express'
+import { userRouter } from './controllers/user.js'
 
-const app = express();
+const app = express()
 
-app.use(express.json());
+app.use(express.json())
 
 // Routes
+app.use('/api/user', userRouter)
 
-export default app;
+export default app
